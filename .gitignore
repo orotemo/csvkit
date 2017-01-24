@@ -1,0 +1,6 @@
+deps
+ebin
+csvkit.d
+erlang.mk
+.erlang.mk
+*.beam
