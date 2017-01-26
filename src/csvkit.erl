@@ -31,16 +31,23 @@
 % {RequestedLine, OriginalLine} | {error, Reason} | done
 % Lines are given as a list.
 -type call_arg() :: {[string()], [string()]} | {error, any()} | done.
--type csv_callback() :: fun ((integer(), call_arg(), any()) -> any()).
+-type user_state() :: any().
+-type csv_callback() :: fun ((integer(), call_arg(), any()) -> user_state()).
 
--spec parse_string(string() | binary(), [string()], csv_callback(), any()) ->
+-spec parse_string(string() | binary(),
+                   [string()],
+                   csv_callback(),
+                   user_state()) ->
   parse_response().
 parse_string(String, Fields, Callback, State) when is_binary(String) ->
   parse_string(binary_to_list(String), Fields, Callback, State);
 parse_string(String, Fields, Callback, State) when is_list(String) ->
   parse_with_fun(process_csv_string_with, String, Fields, Callback, State).
 
--spec parse_file(string(), [string()], csv_callback(), any()) ->
+-spec parse_file(string(),
+                 [string()],
+                 csv_callback(),
+                 user_state()) ->
   parse_response().
 parse_file(Filename, Fields, Callback, State) ->
   case file:open(Filename, [read]) of
@@ -60,7 +67,6 @@ parse_with_fun(Fun, Stream, Fields, Callback, State) ->
   Response = ecsv:Fun(Stream,
                       fun process_line/2,
                       {init, Fields, Callback, State}),
-
   case Response of
     {ok, {_,_,_,Acc}} -> {ok, Acc};
     _ -> Response
@@ -73,9 +79,9 @@ filtering_list(DestinationIdx) ->
   end.
 
 process_line({newline, Line}, {init, Headers, Callback, State})
-    when is_list(Headers) ->
+  when is_list(Headers) ->
   DestinationIdx = maps:from_list(
-      lists:zip(Headers, lists:seq(0, length(Headers) - 1))),
+                     lists:zip(Headers, lists:seq(0, length(Headers) - 1))),
 
   {1, lists:map(filtering_list(DestinationIdx), Line), Callback, State};
 
@@ -93,8 +99,8 @@ line_by_header(_Line, [], Acc) ->
   lists:map(fun({_,V}) -> V end, lists:sort(Acc));
 
 line_by_header([_E | RestLine],
-                 [{_Name, -1} | OtherHeaders],
-                 Acc) -> line_by_header(RestLine, OtherHeaders, Acc);
+               [{_Name, -1} | OtherHeaders],
+               Acc) -> line_by_header(RestLine, OtherHeaders, Acc);
 
 line_by_header([E | RestLine], [{_Name, Idx} | OtherHeaders], Acc) ->
   line_by_header(RestLine, OtherHeaders, [{Idx, E} | Acc]).
