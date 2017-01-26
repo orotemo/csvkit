@@ -67,7 +67,6 @@ parse_with_fun(Fun, Stream, Fields, Callback, State) ->
   Response = ecsv:Fun(Stream,
                       fun process_line/2,
                       {init, Fields, Callback, State}),
-  %  io:format(user,"*** csvkit: Response: ~p~n",[Response]),
   case Response of
     {ok, {_,_,_,Acc}} -> {ok, Acc};
     _ -> Response
