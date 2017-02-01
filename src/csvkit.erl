@@ -50,18 +50,25 @@ parse_string(String, Fields, Callback, State) when is_list(String) ->
                  user_state()) ->
   parse_response().
 parse_file(Filename, Fields, Callback, State) ->
-  case file:open(Filename, [read]) of
-    {ok, File} ->
-      try
-        parse_with_fun(process_csv_file_with, File, Fields, Callback, State)
-      catch
-        Error:Reason -> {Error, Reason}
-      after
-        file:close(File)
-      end;
-
-    Else -> Else
+  Response = csv_streamer:process_csv_file(Filename,
+                                           fun process_line/2,
+                                           {init, Fields, Callback, State}),
+  case Response of
+    {ok, {_,_,_,Acc}} -> {ok, Acc};
+    _ -> Response
   end.
+% case file:open(Filename, [read]) of
+%   {ok, File} ->
+%     try
+%       parse_with_fun(process_csv_file_with, File, Fields, Callback, State)
+%     catch
+%       Error:Reason -> {Error, Reason}
+%     after
+%       file:close(File)
+%     end;
+%
+%   Else -> Else
+% end.
 
 parse_with_fun(Fun, Stream, Fields, Callback, State) ->
   Response = ecsv:Fun(Stream,
