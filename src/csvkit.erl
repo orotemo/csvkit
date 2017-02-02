@@ -53,6 +53,7 @@ parse_file(Filename, Fields, Callback, State) ->
   Response = csv_streamer:process_csv_file(Filename,
                                            fun process_line/2,
                                            {init, Fields, Callback, State}),
+
   case Response of
     {ok, {_,_,_,Acc}} -> {ok, Acc};
     _ -> Response

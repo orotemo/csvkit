@@ -17,6 +17,8 @@ csvkit_string_test_() ->
   csvkit:parse_string(CsvListData, ?COLUMNS, fun send_result/3, 10),
   csvkit_all_tests().
 
+
+
 csvkit_all_tests() ->
   First = receive_once(),
   Second = receive_once(),
