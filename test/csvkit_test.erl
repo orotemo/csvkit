@@ -3,7 +3,7 @@
 -include_lib("eunit/include/eunit.hrl").
 
 -define(COLUMNS, ["column2", "column3"]).
-% testing csvkit according to file csv_example.csv located under the project
+%%% testing csvkit according to file test/csv_example.csvß
 
 csvkit_file_test_() ->
   Filename = <<"test/csv_simple_example.csv">>,
@@ -17,8 +17,6 @@ csvkit_string_test_() ->
   csvkit:parse_string(CsvListData, ?COLUMNS, fun send_result/3, 10),
   csvkit_all_tests().
 
-
-
 csvkit_all_tests() ->
   First = receive_once(),
   Second = receive_once(),
@@ -28,7 +26,6 @@ csvkit_all_tests() ->
    ?_assertMatch({3, done, 12}, Third)
   ].
 
-%%
 receive_once() ->
   receive M -> M
   after 100 -> receive_error
