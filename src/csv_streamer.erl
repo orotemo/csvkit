@@ -1,6 +1,11 @@
 -module(csv_streamer).
-%%% This module helps streaming lines of large files
-%%% TODO: Streaming a string and returning the user lines of this string.
+%%% This module helps streaming lines of csv files
+%%% process_csv_file/3 - Receives files, can be large, streams
+%%% its lines and returns to the callback, line by line a list of
+%%% the line's columns
+%%% process_csv_string/3 - Receives csv data, and streams it
+%%% like process_csv_file/3
+%%% get_line/1 - receives data, returns the line, and rest if data received
 
 -export([process_csv_file/3,
          get_line/1,
@@ -22,7 +27,7 @@ call_lines(State, Callback, UserState) ->
     {eof, _State1, <<>>} ->  Callback({eof}, UserState)
   end.
 
-%%% TODO: finish later on - handle a string and return to
+%%% Handle a string and return to
 %%% its callback the csv lines parsed.
 process_csv_string(String, Callback, UserState) ->
   case get_line(String) of

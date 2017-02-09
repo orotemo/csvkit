@@ -3,7 +3,7 @@
 -include_lib("eunit/include/eunit.hrl").
 
 -define(COLUMNS, ["column2", "column3"]).
-%%% testing csvkit according to file test/csv_example.csvß
+%%% testing csvkit according to file test/csv_example.csv
 
 csvkit_file_test_() ->
   Filename = <<"test/csv_simple_example.csv">>,
