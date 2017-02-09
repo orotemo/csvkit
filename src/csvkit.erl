@@ -32,7 +32,7 @@
 % Lines are given as a list.
 -type call_arg() :: {[string()], [string()]} | {error, any()} | done.
 -type user_state() :: any().
--type csv_callback() :: fun ((integer(), call_arg(), any()) -> user_state()).
+-type csv_callback() :: fun ((integer(), call_arg(), user_state()) -> user_state()).
 
 -spec parse_string(string() | binary(),
                    [string()],

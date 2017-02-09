@@ -1,19 +1,35 @@
 -module(csv_streamer).
 %%% This module helps streaming lines of csv files
-%%% process_csv_file/3 - Receives files, can be large, streams
-%%% its lines and returns to the callback, line by line a list of
-%%% the line's columns
-%%% process_csv_string/3 - Receives csv data, and streams it
-%%% like process_csv_file/3
+%%% process_csv_file/3 - Receives a binary file name,(File can be large)
+%%% Callback, and user's state.
+%%% Process each line in the csv to a list using the csv module
+%%% and for each line calls the callback with the processed line, and the user
+%%% state. The returned data from the callback will be the next user state.
+%%% When file ended, calls the callback with {eof}, UserState
+%%%
+%%% process_csv_string/3 - Receives csv data as a string or as binary,
+%%% and like process_csv_file, calls the callback with the processed line.
+%%%
 %%% get_line/1 - receives data, returns the line, and rest if data received
 
 -export([process_csv_file/3,
          get_line/1,
          process_csv_string/3]).
 
+-type user_state() :: any().
+-type csv_tuple() :: {newline, list()} | {eof}.
+-type csv_callback() :: fun ((csv_tuple(), user_state()) -> user_state()).
+-type process_csv_response() :: {ok, user_state()} | {error, any()}.
+
+-spec process_csv_file(binary(),
+                  csv_callback(),
+                  user_state()) ->
+ process_csv_response().
+
 process_csv_file(FileName, Callback, UserState) ->
   case file_handler:open(FileName) of
-    {ok, State} -> call_lines(State, Callback, UserState);
+    {ok, State} ->
+    call_lines(State, Callback, UserState);
     Else -> Else
   end.
 
@@ -29,6 +45,13 @@ call_lines(State, Callback, UserState) ->
 
 %%% Handle a string and return to
 %%% its callback the csv lines parsed.
+-spec process_csv_string(string(),
+                  csv_callback(),
+                  user_state()) ->
+ process_csv_response().
+
+process_csv_string(String, Callback, UserState) when is_binary(String) ->
+  process_csv_string(binary_to_list(String), Callback, UserState);
 process_csv_string(String, Callback, UserState) ->
   case get_line(String) of
     {Line, Rest} ->
