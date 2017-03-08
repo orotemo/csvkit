@@ -56,7 +56,8 @@ parse_file(Filename, Fields, Callback, State) ->
 
   case Response of
     {ok, {_,_,_,Acc}} -> {ok, Acc};
-    _ -> Response
+    {LineNo, _, _, Acc} when is_number(LineNo) -> {ok, Acc};
+    X -> X
   end.
 
 process_csv_string(Stream, Fields, Callback, State) ->
