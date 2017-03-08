@@ -26,6 +26,11 @@ csvkit_all_tests() ->
    ?_assertMatch({3, done, 12}, Third)
   ].
 
+csvkit_acc_test_() ->
+  Filename = <<"test/csv_simple_example.csv">>,                
+  {ok, Acc} = csvkit:parse_file(Filename, ?COLUMNS, fun send_result/3, 1),
+  [?_assertMatch(4, Acc)].
+
 receive_once() ->
   receive M -> M
   after 100 -> receive_error
