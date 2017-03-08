@@ -56,7 +56,6 @@ parse_file(Filename, Fields, Callback, State) ->
 
   case Response of
     {ok, {_,_,_,Acc}} -> {ok, Acc};
-    {LineNo, _, _, Acc} when is_number(LineNo) -> {ok, Acc};
     X -> X
   end.
 

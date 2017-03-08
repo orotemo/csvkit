@@ -4,7 +4,7 @@
 -define(FEED_EXAMPLE,"test/feed_affiliate_window_parser_test.csv").
 
 csv_streamer_file_test_() ->
-  Lines = csv_streamer:process_csv_file(?FEED_EXAMPLE,
+  {ok, Lines} = csv_streamer:process_csv_file(?FEED_EXAMPLE,
                                         fun csv_callback/2,
                                         [1,[]]),
   [?_assertMatch([8,
@@ -18,7 +18,7 @@ csv_streamer_file_test_() ->
 
 csv_streamer_string_test() ->
  {ok, BinaryData} = file:read_file(?FEED_EXAMPLE),
- Lines = csv_streamer:process_csv_string(BinaryData,
+ {ok, Lines} = csv_streamer:process_csv_string(BinaryData,
                                        fun csv_callback/2,
                                        [1,[]]),
  [?_assertMatch([8,

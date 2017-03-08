@@ -22,14 +22,14 @@
 -type process_csv_response() :: {ok, user_state()} | {error, any()}.
 
 -spec process_csv_file(binary(),
-                  csv_callback(),
-                  user_state()) ->
- process_csv_response().
+                       csv_callback(),
+                       user_state()) ->
+  process_csv_response().
 
 process_csv_file(FileName, Callback, UserState) ->
   case file_handler:open(FileName) of
     {ok, State} ->
-    call_lines(State, Callback, UserState);
+      call_lines(State, Callback, UserState);
     Else -> Else
   end.
 
@@ -40,15 +40,17 @@ call_lines(State, Callback, UserState) ->
       [ParsedLine] = csv:read(LineList),
       UserState1 = Callback({newline, ParsedLine}, UserState),
       call_lines(State1, Callback, UserState1);
-    {eof, _State1, <<>>} ->  Callback({eof}, UserState)
+    {eof, _State1, <<>>} ->
+      UserState1 = Callback({eof}, UserState),
+      {ok, UserState1}
   end.
 
 %%% Handle a string and return to
 %%% its callback the csv lines parsed.
 -spec process_csv_string(string(),
-                  csv_callback(),
-                  user_state()) ->
- process_csv_response().
+                         csv_callback(),
+                         user_state()) ->
+  process_csv_response().
 
 process_csv_string(String, Callback, UserState) when is_binary(String) ->
   process_csv_string(binary_to_list(String), Callback, UserState);
@@ -58,11 +60,14 @@ process_csv_string(String, Callback, UserState) ->
       [ParsedLine] = csv:read(Line),
       UserState1 = Callback({newline, ParsedLine}, UserState),
       process_csv_string(Rest, Callback, UserState1);
-    {[]} -> Callback({eof}, UserState);
+    {[]} ->
+      UserState1 = Callback({eof}, UserState),
+      {ok, UserState1};
     {Line} ->
       [ParsedLine] = csv:read(Line),
       UserState1 = Callback({newline, ParsedLine}, UserState),
-      Callback({eof}, UserState1)
+      UserState2 = Callback({eof}, UserState1),
+      {ok, UserState2}
   end.
 
 %%% Finds the end of a line.

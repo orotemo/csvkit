@@ -21,14 +21,22 @@ csvkit_all_tests() ->
   First = receive_once(),
   Second = receive_once(),
   Third = receive_once(),
+
   [?_assertMatch({1, {["bbb1", "ccc1"], _}, 10}, First),
    ?_assertMatch({2, {["bbb2","ccc2"], _}, 11}, Second),
    ?_assertMatch({3, done, 12}, Third)
   ].
 
-csvkit_acc_test_() ->
-  Filename = <<"test/csv_simple_example.csv">>,                
+csvkit_file_acc_test_() ->
+  Filename = <<"test/csv_simple_example.csv">>,
   {ok, Acc} = csvkit:parse_file(Filename, ?COLUMNS, fun send_result/3, 1),
+  [?_assertMatch(4, Acc)].
+
+csvkit_string_acc_test_() ->
+  Filename = <<"test/csv_simple_example.csv">>,
+  {ok, BinaryData} = file:read_file(Filename),
+  CsvListData = binary_to_list(BinaryData),
+  {ok, Acc} = csvkit:parse_string(CsvListData, ?COLUMNS, fun send_result/3, 1),
   [?_assertMatch(4, Acc)].
 
 receive_once() ->
