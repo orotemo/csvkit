@@ -35,7 +35,7 @@ process_csv_file(FileName, Callback, UserState) ->
 
 call_lines(State, Callback, UserState) ->
   case file_handler:read_line(State) of
-    {ok, State1,Line} ->
+    {ok, State1, Line} ->
       LineList = binary_to_list(Line),
       [ParsedLine] = csv:read(LineList),
       UserState1 = Callback({newline, ParsedLine}, UserState),
@@ -76,10 +76,10 @@ process_csv_string(String, Callback, UserState) ->
 get_line(Data) ->
   get_line(Data,[]).
 
-get_line([],ReversedStart) ->
+get_line([], ReversedStart) ->
   {lists:reverse(ReversedStart)};
-get_line([10 | Rest], ReversedStart) ->
+get_line([10|Rest], ReversedStart) ->
   Line = lists:reverse(ReversedStart),
   {Line, Rest};
-get_line([Char|Rest],ReversedStart) ->
-  get_line(Rest,[Char|ReversedStart]).
+get_line([Char|Rest], ReversedStart) ->
+  get_line(Rest, [Char|ReversedStart]).

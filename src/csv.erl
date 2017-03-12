@@ -17,12 +17,13 @@ read(String, []) ->
 read([10|String], Acc) ->
   {Line, Rest} = read_line(String),
   read(Rest, [Line|Acc]);
-read([13,10|String], Acc) ->
+read([13, 10|String], Acc) ->
   {Line, Rest} = read_line(String),
   read(Rest, [Line|Acc]).
 
 add_spaces(0, String) -> String;
 add_spaces(Count, String) -> add_spaces(Count-1, [$ |String]).
+
 
 read_item([34|T]) -> read_item_quoted(T, []);
 read_item(Other) -> read_item(Other, 0, []).

@@ -55,7 +55,7 @@ parse_file(Filename, Fields, Callback, State) ->
                                            {init, Fields, Callback, State}),
 
   case Response of
-    {ok, {_,_,_,Acc}} -> {ok, Acc};
+    {ok, {_, _, _, Acc}} -> {ok, Acc};
     X -> X
   end.
 
@@ -64,7 +64,7 @@ process_csv_string(Stream, Fields, Callback, State) ->
                                              fun process_line/2,
                                              {init, Fields, Callback, State}),
   case Response of
-    {ok, {_,_,_,Acc}} -> {ok, Acc};
+    {ok, {_, _, _, Acc}} -> {ok, Acc};
     _ -> Response
   end.
 

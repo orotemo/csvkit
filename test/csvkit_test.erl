@@ -23,7 +23,7 @@ csvkit_all_tests() ->
   Third = receive_once(),
 
   [?_assertMatch({1, {["bbb1", "ccc1"], _}, 10}, First),
-   ?_assertMatch({2, {["bbb2","ccc2"], _}, 11}, Second),
+   ?_assertMatch({2, {["bbb2", "ccc2"], _}, 11}, Second),
    ?_assertMatch({3, done, 12}, Third)
   ].
 
