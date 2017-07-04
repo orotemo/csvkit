@@ -50,6 +50,7 @@ read_line(String) -> read_line(String,[]).
 
 read_line([10|T], Acc) -> {lists:reverse(Acc), [10|T]};
 read_line([13,10|T], Acc) -> {lists:reverse(Acc), [13|T]};
+read_line([13|T], Acc) -> read_line(T, Acc);
 read_line([], Acc) -> {lists:reverse(Acc), []};
 read_line(String, []) -> 
   {Item, Rest} = read_item(String), read_line(Rest, [Item]);
