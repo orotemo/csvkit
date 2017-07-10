@@ -32,7 +32,7 @@
 % Lines are given as a list.
 -type call_arg() :: {[string()], [string()]} | {error, any()} | done.
 -type user_state() :: any().
--type csv_callback() :: fun ((integer(), call_arg(), any()) -> user_state()).
+-type csv_callback() :: fun ((integer(), call_arg(), user_state()) -> user_state()).
 
 -spec parse_string(string() | binary(),
                    [string()],
@@ -42,7 +42,7 @@
 parse_string(String, Fields, Callback, State) when is_binary(String) ->
   parse_string(binary_to_list(String), Fields, Callback, State);
 parse_string(String, Fields, Callback, State) when is_list(String) ->
-  parse_with_fun(process_csv_string_with, String, Fields, Callback, State).
+  process_csv_string(String, Fields, Callback, State).
 
 -spec parse_file(string(),
                  [string()],
@@ -50,25 +50,21 @@ parse_string(String, Fields, Callback, State) when is_list(String) ->
                  user_state()) ->
   parse_response().
 parse_file(Filename, Fields, Callback, State) ->
-  case file:open(Filename, [read]) of
-    {ok, File} ->
-      try
-        parse_with_fun(process_csv_file_with, File, Fields, Callback, State)
-      catch
-        Error:Reason -> {Error, Reason}
-      after
-        file:close(File)
-      end;
+  Response = csv_streamer:process_csv_file(Filename,
+                                           fun process_line/2,
+                                           {init, Fields, Callback, State}),
 
-    Else -> Else
+  case Response of
+    {ok, {_, _, _, Acc}} -> {ok, Acc};
+    X -> X
   end.
 
-parse_with_fun(Fun, Stream, Fields, Callback, State) ->
-  Response = ecsv:Fun(Stream,
-                      fun process_line/2,
-                      {init, Fields, Callback, State}),
+process_csv_string(Stream, Fields, Callback, State) ->
+  Response = csv_streamer:process_csv_string(Stream,
+                                             fun process_line/2,
+                                             {init, Fields, Callback, State}),
   case Response of
-    {ok, {_,_,_,Acc}} -> {ok, Acc};
+    {ok, {_, _, _, Acc}} -> {ok, Acc};
     _ -> Response
   end.
 
